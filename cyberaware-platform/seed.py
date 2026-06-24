@@ -12,6 +12,16 @@ from app.models import (
     PhishingCampaign, PhishingAssignment, ActivityLog
 )
 
+# Externalised content: 15 "top attack" modules + 20 extra questions per
+# existing module (see seed_data/). Kept in separate files so the large quiz
+# content stays out of this orchestration module.
+from seed_data.attacks_a import MODULES as _ATTACKS_A
+from seed_data.attacks_b import MODULES as _ATTACKS_B
+from seed_data.attacks_c import MODULES as _ATTACKS_C
+from seed_data.existing_extra import EXTRA_QUESTIONS
+
+NEW_ATTACK_MODULES = _ATTACKS_A + _ATTACKS_B + _ATTACKS_C
+
 
 # ---------------------------------------------------------------------------
 # Module content (authored / trusted HTML).
@@ -556,6 +566,27 @@ PASSWORD_ATTACKS_QUIZ = [
      "Logging passwords in plain text", "Disabling HTTPS", "B",
      "Throttling and lockouts blunt automated guessing attacks like brute force "
      "and spraying."),
+    ("The most phishing-resistant form of MFA is:",
+     "SMS one-time codes", "Email codes",
+     "A FIDO2/WebAuthn hardware security key", "Security questions", "C",
+     "Hardware security keys bind the login to the real site's origin, so they "
+     "cannot be relayed to a phishing page like SMS or app codes."),
+    ("Storing user passwords safely on a server means:",
+     "Encrypting them reversibly", "Saving them in plain text",
+     "Hashing them with a slow salted algorithm (e.g. bcrypt/argon2)",
+     "Emailing them to the user", "C",
+     "Passwords should be one-way hashed with a slow, salted algorithm so a "
+     "database leak does not reveal them."),
+    ("'Passwordless' login with passkeys improves security mainly because:",
+     "Passkeys are shorter", "There is no shared secret to phish or reuse",
+     "They never expire", "They disable MFA", "B",
+     "Passkeys use public-key cryptography, so there is no reusable secret for an "
+     "attacker to steal, phish, or replay."),
+    ("After a confirmed credential breach, the FIRST priority is to:",
+     "Buy new laptops", "Reset affected passwords and revoke active sessions/tokens",
+     "Email all customers a coupon", "Ignore it if no money was lost", "B",
+     "Containment starts by invalidating the compromised credentials and sessions "
+     "so the attacker loses access."),
 ]
 
 MALWARE_QUIZ = [
@@ -587,6 +618,26 @@ MALWARE_QUIZ = [
      "Firewall", "Password manager", "B",
      "Keyloggers secretly capture what you type, including passwords, and send it "
      "to an attacker."),
+    ("'Double extortion' ransomware adds which extra threat?",
+     "Slower encryption", "Leaking stolen data publicly if the ransom is unpaid",
+     "Free decryption", "Better backups", "B",
+     "Double-extortion gangs steal data before encrypting and threaten to publish "
+     "it, pressuring victims even when they have backups."),
+    ("Macro malware most commonly arrives via:",
+     "A firmware update", "Office documents with malicious macros",
+     "A wired keyboard", "A monitor cable", "B",
+     "Attackers embed malicious macros in documents and lure users to 'Enable "
+     "Content'; disable macros from the internet by default."),
+    ("The safest response to a suspicious email attachment is to:",
+     "Open it to check", "Forward it to friends",
+     "Not open it and report it to security", "Rename the file extension", "C",
+     "Unexpected attachments are a top malware vector; verify out-of-band and let "
+     "security analyze it."),
+    ("Endpoint Detection and Response (EDR) primarily helps by:",
+     "Speeding up the CPU", "Detecting and responding to malicious behavior on devices",
+     "Encrypting the monitor", "Blocking all email", "B",
+     "EDR monitors endpoint behavior to detect, investigate, and contain threats "
+     "that signature-only antivirus may miss."),
 ]
 
 NETWORK_WEB_QUIZ = [
@@ -618,6 +669,26 @@ NETWORK_WEB_QUIZ = [
      "Better battery life", "Stronger encryption", "B",
      "Certificate warnings often signal interception; never click through them on "
      "untrusted networks."),
+    ("Server-Side Request Forgery (SSRF) lets an attacker:",
+     "Speed up the server", "Make the server send requests to unintended internal targets",
+     "Encrypt the database", "Improve caching", "B",
+     "SSRF abuses a server's ability to fetch URLs, reaching internal services or "
+     "cloud metadata the attacker could not access directly."),
+    ("Security headers like Content-Security-Policy primarily help mitigate:",
+     "Disk failures", "Cross-site scripting (XSS)",
+     "Slow networks", "Weak passwords", "B",
+     "CSP restricts where scripts and resources may load from, reducing the impact "
+     "of injected/XSS content."),
+    ("HTTP Strict Transport Security (HSTS) protects users by:",
+     "Compressing pages", "Forcing browsers to use HTTPS for the site",
+     "Blocking cookies", "Disabling JavaScript", "B",
+     "HSTS tells browsers to only connect over HTTPS, preventing downgrade and "
+     "SSL-stripping man-in-the-middle attacks."),
+    ("A WAF (Web Application Firewall) is best described as a control that:",
+     "Backs up the database", "Filters and blocks malicious HTTP traffic to an app",
+     "Encrypts the disk", "Manages passwords", "B",
+     "A WAF inspects incoming web requests and blocks common application-layer "
+     "attacks such as injection and XSS attempts."),
 ]
 
 
@@ -730,7 +801,29 @@ def _do_seed():
     _add_questions(m6, NETWORK_WEB_QUIZ)
     db.session.commit()
 
-    modules = [m1, m2, m3, m4, m5, m6]
+    # Top up each existing module to 30 questions with the extra question banks.
+    existing_by_title = {m.title: m for m in (m1, m2, m3, m4, m5, m6)}
+    for title, extra in EXTRA_QUESTIONS.items():
+        _add_questions(existing_by_title[title], extra)
+    db.session.commit()
+
+    # --- 15 "top attack" modules (orders 7-21) from seed_data ---
+    new_modules = []
+    for spec in NEW_ATTACK_MODULES:
+        nm = TrainingModule(
+            title=spec['title'], description=spec['description'],
+            content=spec['content'], category=spec['category'],
+            is_active=True, order=spec['order'],
+        )
+        db.session.add(nm)
+        new_modules.append((nm, spec['questions']))
+    db.session.commit()
+
+    for nm, questions in new_modules:
+        _add_questions(nm, questions)
+    db.session.commit()
+
+    modules = [m1, m2, m3, m4, m5, m6] + [nm for nm, _ in new_modules]
 
     # --- Assign all modules to all employees (UserProgress rows) ---
     for emp in employees:

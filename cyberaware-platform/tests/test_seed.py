@@ -25,17 +25,18 @@ def seeded(app):
 
 class TestSeedCounts:
     def test_expected_record_counts(self, seeded):
+        # 21 modules (6 existing + 15 top-attack), every quiz 30 questions.
         assert User.query.count() == 5
-        assert TrainingModule.query.count() == 6
-        assert QuizQuestion.query.count() == 48
+        assert TrainingModule.query.count() == 21
+        assert QuizQuestion.query.count() == 21 * 30
         assert PhishingCampaign.query.count() == 6
 
     def test_seed_is_idempotent(self, seeded):
         # Running again must not duplicate data (skips when admin exists).
         seed()
         assert User.query.count() == 5
-        assert TrainingModule.query.count() == 6
-        assert QuizQuestion.query.count() == 48
+        assert TrainingModule.query.count() == 21
+        assert QuizQuestion.query.count() == 21 * 30
 
 
 class TestSeedContent:

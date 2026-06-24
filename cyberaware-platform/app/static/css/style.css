@@ -953,6 +953,149 @@ input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width
 .result-row.correct   { background: var(--success-bg); border-color: rgba(34,197,94,.35); }
 .result-row.incorrect { background: var(--danger-bg);  border-color: rgba(244,63,94,.35); }
 
+/* ── Quiz — responsive & accessibility fixes ───────────────── */
+
+/*
+ * 1. Browsers give <fieldset> min-inline-size: min-content by default.
+ *    That makes wide questions overflow the viewport on narrow screens.
+ *    Zero it out so the fieldset shrinks with its container.
+ */
+.quiz-question {
+  min-inline-size: 0;
+}
+
+/*
+ * 2. Radio sits flush-left and never shrinks when option text wraps to
+ *    multiple lines.  align-self: flex-start keeps it at the text baseline
+ *    on the first line, which is the natural reading anchor.
+ */
+.quiz-option input[type="radio"],
+.quiz-form .option-item label input[type="radio"] {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: .22em; /* optical alignment with cap-height of first line */
+}
+
+/*
+ * 3. align-items: flex-start is safer than center for multi-line labels.
+ *    min-height: 44px guarantees a comfortable touch target even on short
+ *    single-line options.  word-break / overflow-wrap prevent long URLs or
+ *    compound words from punching through the card edge.
+ */
+.quiz-option,
+.quiz-form .option-item label {
+  align-items: flex-start;
+  min-height: 44px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* 4. Keyboard / focus-visible ring on the whole option row */
+.quiz-option:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 5. Result answer text must never overflow the card */
+.quiz-result-answers strong,
+.quiz-result-item .quiz-prompt {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * 6. Submit-bar wrapper — gives us a hook for the sticky mobile bar.
+ *    On desktop/tablet it's just a normal block with a little top spacing.
+ */
+.quiz-submit-bar {
+  margin-top: 1.25rem;
+}
+
+/* ── Quiz tablet (≤768 px) ─────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Tighter card padding saves horizontal real-estate */
+  .quiz-form .quiz-question {
+    padding: 1.1rem;
+  }
+
+  /* Slightly smaller score digit so it doesn't dominate the screen */
+  .quiz-result-summary .stat-value {
+    font-size: 2.6rem;
+  }
+  .quiz-result-summary {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Stack action buttons so they get full width */
+  .quiz-result-actions {
+    flex-direction: column;
+  }
+  .quiz-result-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ── Quiz mobile (≤480 px) ─────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Even tighter card padding — breathing room without wasting width */
+  .quiz-form .quiz-question {
+    padding: .85rem .9rem;
+  }
+
+  /* Slightly smaller question text so a full sentence fits on 2–3 lines */
+  .quiz-prompt,
+  .quiz-form .question-text {
+    font-size: .97rem;
+  }
+
+  /* Bigger tap-padding, but no translateX — the 3 px slide can tickle the
+     horizontal scrollbar on very narrow viewports */
+  .quiz-option,
+  .quiz-form .option-item label {
+    padding: .8rem .75rem;
+  }
+  .quiz-option:hover {
+    transform: none;
+  }
+
+  /*
+   * Sticky submit bar: bleeds to the edges of .content's 1.1 rem padding
+   * so it spans the full viewport width.  Glassmorphism keeps it on-theme.
+   */
+  .quiz-submit-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    margin-top: 1rem;
+    /* compensate for .content's 1.1 rem side padding */
+    margin-left:  -1.1rem;
+    margin-right: -1.1rem;
+    margin-bottom: -1.1rem;
+    padding: .8rem 1.1rem;
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--glass-border);
+    box-shadow: 0 -6px 24px -8px rgba(46, 32, 90, .22);
+  }
+  .quiz-submit-bar .btn {
+    width: 100%;
+  }
+
+  /* Answer list: stack everything vertically on tiny screens */
+  .quiz-result-answers li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .35rem;
+  }
+
+  /* Score digit scales down gracefully */
+  .quiz-result-summary .stat-value {
+    font-size: 2.2rem;
+  }
+}
+
 /* ── Email viewer (modern mail client) ─────────────────────── */
 .email-viewer {
   max-width: 760px;
