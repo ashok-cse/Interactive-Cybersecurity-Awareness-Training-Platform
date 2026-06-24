@@ -9,8 +9,13 @@ campaigns, and analytics.
 
 ## Features
 
-- **Training Modules** – structured content with interactive in-page exercises.
-- **Auto-graded Quizzes** – score = round(correct/total × 100); pass threshold 70 %.
+- **Training Modules** – 21 modules covering the most common attack types
+  (phishing, ransomware, malware, DDoS, MitM, supply-chain, zero-day, credential
+  theft, cloud misconfig, BEC, living-off-the-land, AI/deepfakes, SQLi, IoT,
+  insider threats, plus secure coding and threat modeling), each with structured
+  content and an interactive in-page exercise.
+- **Auto-graded Quizzes** – 30 questions per module (630 total); score =
+  round(correct/total × 100); pass threshold 70 %, with retakes.
 - **Simulated Phishing Inbox** – employees identify phishing vs. legitimate emails.
 - **Role-based Dashboards** – tailored views for Employee, Trainer, and Admin.
 - **Analytics** – completion rates, average scores, pass/fail charts (Chart.js).
@@ -47,6 +52,7 @@ cyberaware-platform/
 │   ├── models.py            # SQLAlchemy models
 │   ├── forms.py             # WTForms form classes
 │   ├── security.py          # roles_required, admin_required, staff_required, log_activity
+│   ├── utils.py             # shared helpers (naive-UTC utcnow)
 │   ├── routes/
 │   │   ├── auth.py          # Blueprint 'auth'      – /register /login /logout /profile
 │   │   ├── dashboard.py     # Blueprint 'dashboard' – / /dashboard
@@ -61,7 +67,13 @@ cyberaware-platform/
 │   ├── test_auth.py
 │   ├── test_quiz.py
 │   ├── test_security.py
-│   └── test_admin.py
+│   ├── test_admin.py
+│   └── test_seed.py         # seed-data integrity (counts, demo accounts)
+├── seed_data/               # Externalised quiz/module content
+│   ├── attacks_a.py         # attack modules 7–11  (MODULES list)
+│   ├── attacks_b.py         # attack modules 12–16
+│   ├── attacks_c.py         # attack modules 17–21
+│   └── existing_extra.py    # extra question banks for the 6 base modules
 ├── run.py                   # Development entry-point
 ├── db_init.py               # One-off DB initialisation script
 ├── seed.py                  # Demo data seeder (also `flask seed` CLI)
