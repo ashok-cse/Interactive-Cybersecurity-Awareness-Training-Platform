@@ -189,6 +189,182 @@ THREAT_MODELING_CONTENT = """
 """
 
 
+PASSWORD_ATTACKS_CONTENT = """
+<section>
+  <h2>Password &amp; Authentication Attacks</h2>
+  <p>Credentials are the keys to the kingdom. This module covers how attackers
+  defeat passwords &mdash; <strong>brute force</strong>, <strong>credential
+  stuffing</strong>, <strong>password spraying</strong>, and <strong>MFA
+  fatigue</strong> &mdash; and the controls that stop them.</p>
+</section>
+
+<section>
+  <h3>1. Brute force &amp; password spraying</h3>
+  <p>Brute force tries many passwords against one account; password spraying
+  tries one common password (e.g. <code>Spring2024!</code>) across many accounts
+  to dodge lockouts. Both are beaten by rate limiting, lockouts, and long unique
+  passphrases.</p>
+  <div class="code-compare">
+    <pre class="code-block vulnerable"><code># VULNERABLE: unlimited login attempts
+def login(user, pw):
+    return check(user, pw)   # no throttling, no lockout</code></pre>
+    <pre class="code-block secure"><code># SECURE: throttle + lockout
+@limiter.limit("5 per minute")
+def login(user, pw):
+    if locked_out(user): abort(429)
+    return check(user, pw)</code></pre>
+  </div>
+</section>
+
+<section>
+  <h3>2. Credential stuffing</h3>
+  <p>Attackers replay username/password pairs leaked from <em>other</em> breaches,
+  betting that people reuse passwords. A unique password per site plus MFA makes a
+  leaked password useless elsewhere.</p>
+  <ul>
+    <li>Use a password manager so every login is unique.</li>
+    <li>Turn on multi-factor authentication (MFA) everywhere.</li>
+    <li>Check exposure at your org's breach-monitoring tool.</li>
+  </ul>
+</section>
+
+<section>
+  <h3>3. MFA fatigue (push bombing)</h3>
+  <p>Once an attacker has your password, they spam you with approval prompts
+  hoping you tap &ldquo;Approve&rdquo; out of annoyance. Never approve a prompt you
+  did not start &mdash; deny it and change your password.</p>
+</section>
+
+<section class="exercise" data-exercise="scenario">
+  <h3>Scenario: How should you respond?</h3>
+  <p><em>Your phone buzzes with repeated &ldquo;Approve sign-in?&rdquo; prompts you
+  did not request, at 2 a.m.</em></p>
+  <div class="exercise-options">
+    <button type="button" class="btn btn-secondary" data-answer="unsafe">Approve one so they stop</button>
+    <button type="button" class="btn btn-secondary" data-answer="safe" data-correct="true">Deny, then change your password and tell security</button>
+  </div>
+  <p class="exercise-feedback" hidden></p>
+</section>
+"""
+
+
+MALWARE_CONTENT = """
+<section>
+  <h2>Malware &amp; Ransomware</h2>
+  <p>Malware is any software built to harm or exploit a system. This module covers
+  the main families &mdash; <strong>viruses &amp; worms</strong>,
+  <strong>trojans</strong>, <strong>spyware/keyloggers</strong>, and
+  <strong>ransomware</strong> &mdash; and how to avoid and contain them.</p>
+</section>
+
+<section>
+  <h3>1. Common malware families</h3>
+  <table class="table">
+    <thead><tr><th>Type</th><th>How it spreads</th><th>Goal</th></tr></thead>
+    <tbody>
+      <tr><td>Virus / Worm</td><td>Infected files; self-propagation</td><td>Spread &amp; damage</td></tr>
+      <tr><td>Trojan</td><td>Disguised as legit software</td><td>Backdoor access</td></tr>
+      <tr><td>Spyware / Keylogger</td><td>Bundled downloads, phishing</td><td>Steal data &amp; keystrokes</td></tr>
+      <tr><td>Ransomware</td><td>Phishing, RDP, exploits</td><td>Encrypt &amp; extort</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h3>2. Ransomware</h3>
+  <p>Ransomware encrypts your files and demands payment. The best defense is
+  prevention plus <strong>tested, offline backups</strong> so you can restore
+  without paying. Paying funds crime and never guarantees recovery.</p>
+  <ul>
+    <li>Patch promptly and disable macros from the internet.</li>
+    <li>Keep 3-2-1 backups (3 copies, 2 media, 1 offline).</li>
+    <li>Isolate an infected machine from the network immediately.</li>
+  </ul>
+</section>
+
+<section>
+  <h3>3. Infection vectors to watch</h3>
+  <p>Most malware arrives through phishing attachments, malicious links, pirated
+  software, and unknown USB drives. When in doubt, do not open it &mdash; report it.</p>
+</section>
+
+<section class="exercise" data-exercise="scenario">
+  <h3>Scenario: How should you respond?</h3>
+  <p><em>A file you opened just popped up: &ldquo;Your files are encrypted. Pay 0.5
+  BTC to recover them.&rdquo;</em></p>
+  <div class="exercise-options">
+    <button type="button" class="btn btn-secondary" data-answer="unsafe">Pay quickly before the deadline</button>
+    <button type="button" class="btn btn-secondary" data-answer="safe" data-correct="true">Disconnect from the network and call security/IT now</button>
+  </div>
+  <p class="exercise-feedback" hidden></p>
+</section>
+"""
+
+
+NETWORK_WEB_CONTENT = """
+<section>
+  <h2>Network &amp; Web Attacks</h2>
+  <p>Beyond code and people, attackers target the wire and the web app itself. This
+  module covers <strong>Man-in-the-Middle (MITM)</strong>,
+  <strong>Denial of Service (DoS/DDoS)</strong>, <strong>Cross-Site Request
+  Forgery (CSRF)</strong>, and <strong>Insecure Direct Object References
+  (IDOR)</strong>.</p>
+</section>
+
+<section>
+  <h3>1. Man-in-the-Middle (MITM)</h3>
+  <p>On open Wi-Fi an attacker can sit between you and a site, reading or altering
+  traffic. Always use HTTPS and a corporate VPN on untrusted networks; never ignore
+  certificate warnings.</p>
+</section>
+
+<section>
+  <h3>2. Denial of Service (DoS / DDoS)</h3>
+  <p>Floods of traffic exhaust a service so real users cannot reach it &mdash; an
+  <em>availability</em> attack. Defenses include rate limiting, autoscaling, and
+  upstream DDoS protection.</p>
+</section>
+
+<section>
+  <h3>3. Cross-Site Request Forgery (CSRF)</h3>
+  <p>CSRF tricks a logged-in user's browser into submitting an unwanted action. The
+  fix is an unguessable anti-CSRF token on every state-changing request &mdash;
+  exactly what this platform does on its forms.</p>
+  <div class="code-compare">
+    <pre class="code-block vulnerable"><code>&lt;!-- VULNERABLE: no token --&gt;
+&lt;form method="post" action="/transfer"&gt;
+  &lt;input name="amount" value="1000"&gt;
+&lt;/form&gt;</code></pre>
+    <pre class="code-block secure"><code>&lt;!-- SECURE: anti-CSRF token --&gt;
+&lt;form method="post" action="/transfer"&gt;
+  &lt;input type="hidden" name="csrf_token" value="..."&gt;
+  &lt;input name="amount" value="1000"&gt;
+&lt;/form&gt;</code></pre>
+  </div>
+</section>
+
+<section>
+  <h3>4. Insecure Direct Object Reference (IDOR)</h3>
+  <p>If <code>/invoice/123</code> lets you read someone else's invoice by changing
+  the number, that is IDOR. Always enforce an ownership/authorization check on the
+  server, not just hide the link.</p>
+</section>
+
+<section class="exercise" data-exercise="code-review">
+  <h3>Quick check: Is this route secure or vulnerable?</h3>
+  <pre class="code-block"><code>@app.get("/invoice/&lt;id&gt;")
+def invoice(id):
+    return Invoice.query.get(id)   # returns any invoice by id</code></pre>
+  <p>Click your answer:</p>
+  <div class="exercise-options">
+    <button type="button" class="btn btn-secondary" data-answer="secure">Secure</button>
+    <button type="button" class="btn btn-secondary" data-answer="vulnerable" data-correct="true">Vulnerable</button>
+  </div>
+  <p class="exercise-feedback" hidden></p>
+</section>
+"""
+
+
 # ---------------------------------------------------------------------------
 # Quiz definitions: list of (question, a, b, c, d, correct, explanation)
 # ---------------------------------------------------------------------------
@@ -224,6 +400,27 @@ SECURE_CODING_QUIZ = [
      "Only accept input from admins", "Log every keystroke", "A",
      "All data crossing a trust boundary must be validated and properly handled "
      "before use."),
+    ("Which practice best prevents stored XSS in user-generated content?",
+     "Storing input in uppercase", "Context-aware output encoding/escaping",
+     "Using a faster database", "Allowing all HTML tags", "B",
+     "Encoding data for the context where it is rendered stops the browser from "
+     "executing injected markup or script."),
+    ("An ORM like SQLAlchemy helps prevent SQL injection because it:",
+     "Encrypts the whole database", "Parameterizes queries by default",
+     "Disables the network", "Caches every query", "B",
+     "ORMs bind parameters separately from the SQL text, so user data is never "
+     "parsed as part of the query."),
+    ("What is the safest way to handle secrets like API keys in code?",
+     "Hard-code them for convenience", "Commit them to the repo",
+     "Load them from environment variables / a secrets manager",
+     "Email them to the team", "C",
+     "Secrets should live outside source control, injected via environment "
+     "variables or a dedicated secrets manager."),
+    ("'Defense in depth' means:",
+     "Relying on one strong firewall", "Layering multiple independent controls",
+     "Only encrypting passwords", "Hiding the source code", "B",
+     "Multiple overlapping controls ensure that if one fails, others still "
+     "protect the system."),
 ]
 
 SOCIAL_ENGINEERING_QUIZ = [
@@ -258,6 +455,27 @@ SOCIAL_ENGINEERING_QUIZ = [
      "Encrypt the connection", "Block cookies", "B",
      "Hovering reveals the actual target so you can spot mismatched or malicious "
      "domains before clicking."),
+    ("'Smishing' refers to social engineering carried out over:",
+     "SMS text messages", "Smoke signals", "Shared printers", "Slack only", "A",
+     "Smishing is phishing via SMS; vishing is via voice calls. Treat unexpected "
+     "links and requests in texts with the same caution as email."),
+    ("A caller claims to be your bank and asks you to read back a code 'to verify "
+     "your identity'. You should:",
+     "Read the code to prove who you are", "Refuse and hang up; banks never ask "
+     "for one-time codes", "Give it only if they sound official", "Text it instead",
+     "B",
+     "One-time codes authenticate YOU; anyone asking you to share one is trying "
+     "to take over your account."),
+    ("Tailgating in physical security means:",
+     "Driving too close", "Following an authorized person through a secure door",
+     "Spamming an inbox", "Reusing a password", "B",
+     "Tailgating is following someone into a restricted area without badging in; "
+     "always ensure doors close behind you."),
+    ("The strongest reason to report a phishing email you spotted is:",
+     "To get a reward", "So security can warn others and block the campaign",
+     "To delete it faster", "It is required by law everywhere", "B",
+     "Reporting lets the security team contain the campaign and protect colleagues "
+     "who may also have received it."),
 ]
 
 THREAT_MODELING_QUIZ = [
@@ -286,6 +504,120 @@ THREAT_MODELING_QUIZ = [
      "Never, it is optional", "Only during a yearly audit", "B",
      "Modeling threats during design lets you address them before they are built "
      "into the system, which is far cheaper."),
+    ("Information Disclosure in STRIDE violates which property?",
+     "Availability", "Confidentiality", "Integrity", "Authentication", "B",
+     "Information Disclosure exposes data to those not authorized to see it, "
+     "breaking confidentiality."),
+    ("Repudiation threats are best countered by:",
+     "Faster servers", "Secure audit logging and signatures",
+     "Bigger passwords", "More RAM", "B",
+     "Tamper-evident logs and digital signatures let you prove who did what, "
+     "defeating repudiation."),
+    ("A 'trust boundary' in a data-flow diagram is where:",
+     "Two servers share a cable", "Data crosses between different privilege levels",
+     "The CPU meets the GPU", "Logs are rotated", "B",
+     "Trust boundaries mark where data moves between components of differing trust, "
+     "the places most worth scrutinizing for threats."),
+    ("After identifying and rating threats, the next step is to:",
+     "Ignore low-cost ones", "Define and track mitigations for prioritized threats",
+     "Delete the model", "Publish them publicly", "B",
+     "Threat modeling drives action: each significant threat should get an owned, "
+     "tracked mitigation."),
+]
+
+PASSWORD_ATTACKS_QUIZ = [
+    ("Password spraying differs from brute force because it:",
+     "Tries many passwords on one account",
+     "Tries one common password across many accounts",
+     "Only targets admins", "Requires the password already", "B",
+     "Spraying uses a few common passwords against many accounts to avoid "
+     "triggering per-account lockouts."),
+    ("Credential stuffing succeeds mainly because people:",
+     "Use long passwords", "Reuse the same password across sites",
+     "Enable MFA", "Use password managers", "B",
+     "Reused passwords let attackers replay credentials leaked from one breach "
+     "against your other accounts."),
+    ("The single most effective add-on defense against stolen passwords is:",
+     "A longer username", "Multi-factor authentication (MFA)",
+     "Changing passwords daily", "A custom font", "B",
+     "MFA means a stolen password alone is not enough to log in."),
+    ("'MFA fatigue' attacks rely on the victim:",
+     "Forgetting their password", "Approving a push prompt they did not initiate",
+     "Using a hardware key", "Disabling notifications", "B",
+     "Attackers spam approval prompts hoping you tap Approve; deny prompts you "
+     "did not start and change your password."),
+    ("Why is a password manager recommended?",
+     "It makes passwords shorter", "It generates and stores unique strong passwords",
+     "It disables MFA", "It shares passwords by email", "B",
+     "A manager lets every account have a unique, strong password without you "
+     "memorizing them."),
+    ("A good account-protection control on login servers is:",
+     "Unlimited attempts", "Rate limiting and lockout after repeated failures",
+     "Logging passwords in plain text", "Disabling HTTPS", "B",
+     "Throttling and lockouts blunt automated guessing attacks like brute force "
+     "and spraying."),
+]
+
+MALWARE_QUIZ = [
+    ("Ransomware's primary goal is to:",
+     "Speed up your PC", "Encrypt your files and demand payment",
+     "Update your software", "Improve backups", "B",
+     "Ransomware encrypts data and extorts the victim for a decryption key."),
+    ("The best protection that lets you recover from ransomware without paying is:",
+     "Antivirus alone", "Tested offline backups",
+     "A faster CPU", "Paying quickly", "B",
+     "Reliable offline (3-2-1) backups let you restore data instead of paying a "
+     "ransom."),
+    ("A trojan is malware that:",
+     "Self-replicates across networks", "Disguises itself as legitimate software",
+     "Only affects servers", "Cannot be removed", "B",
+     "A trojan tricks the user into running it by masquerading as something "
+     "trustworthy."),
+    ("If you suspect your machine is infected, you should first:",
+     "Keep working", "Disconnect it from the network and report it",
+     "Email the file to colleagues", "Pay any ransom", "B",
+     "Isolating the device limits spread; then let security/IT investigate."),
+    ("Which is a common malware infection vector?",
+     "Reading plain-text email", "Opening a malicious attachment or link",
+     "Locking your screen", "Using a password manager", "B",
+     "Phishing attachments and links are among the most common ways malware gets "
+     "in."),
+    ("A keylogger is a type of:",
+     "Backup tool", "Spyware that records keystrokes",
+     "Firewall", "Password manager", "B",
+     "Keyloggers secretly capture what you type, including passwords, and send it "
+     "to an attacker."),
+]
+
+NETWORK_WEB_QUIZ = [
+    ("A Man-in-the-Middle attack is most likely on:",
+     "A wired corporate LAN with TLS", "Open public Wi-Fi without a VPN",
+     "An offline laptop", "A printed document", "B",
+     "Untrusted open networks let an attacker intercept traffic; HTTPS and a VPN "
+     "mitigate this."),
+    ("A DoS/DDoS attack primarily harms which security property?",
+     "Confidentiality", "Integrity", "Availability", "Non-repudiation", "C",
+     "Denial of service floods a system so legitimate users cannot reach it, "
+     "harming availability."),
+    ("CSRF attacks are prevented by:",
+     "Hiding the form", "Anti-CSRF tokens on state-changing requests",
+     "Longer passwords", "Disabling cookies entirely", "B",
+     "An unguessable per-session token ensures requests genuinely came from your "
+     "app, not an attacker's page."),
+    ("Changing /invoice/123 to /invoice/124 and seeing someone else's data is:",
+     "XSS", "IDOR (broken object-level authorization)", "A DoS", "Spoofing", "B",
+     "IDOR occurs when the server fails to check that the user owns the requested "
+     "object."),
+    ("The correct fix for IDOR is to:",
+     "Use random-looking IDs only", "Enforce a server-side ownership/authorization "
+     "check", "Hide the URL", "Cache the response", "B",
+     "Obscurity is not enough; the server must verify the requester is authorized "
+     "for that specific object."),
+    ("Ignoring a browser certificate warning on public Wi-Fi can enable:",
+     "Faster browsing", "A Man-in-the-Middle interception",
+     "Better battery life", "Stronger encryption", "B",
+     "Certificate warnings often signal interception; never click through them on "
+     "untrusted networks."),
 ]
 
 
@@ -366,15 +698,39 @@ def _do_seed():
         content=THREAT_MODELING_CONTENT,
         category='Security Design', is_active=True, order=3,
     )
-    db.session.add_all([m1, m2, m3])
+    m4 = TrainingModule(
+        title='Password & Authentication Attacks',
+        description='Defend against brute force, credential stuffing, password '
+                    'spraying, and MFA fatigue with MFA and password managers.',
+        content=PASSWORD_ATTACKS_CONTENT,
+        category='Identity & Access', is_active=True, order=4,
+    )
+    m5 = TrainingModule(
+        title='Malware & Ransomware',
+        description='Recognize viruses, trojans, spyware, and ransomware, their '
+                    'infection vectors, and how to contain and recover.',
+        content=MALWARE_CONTENT,
+        category='Endpoint Security', is_active=True, order=5,
+    )
+    m6 = TrainingModule(
+        title='Network & Web Attacks',
+        description='Understand MITM, DoS/DDoS, CSRF, and IDOR, and the controls '
+                    'that stop them.',
+        content=NETWORK_WEB_CONTENT,
+        category='Network Security', is_active=True, order=6,
+    )
+    db.session.add_all([m1, m2, m3, m4, m5, m6])
     db.session.commit()
 
     _add_questions(m1, SECURE_CODING_QUIZ)
     _add_questions(m2, SOCIAL_ENGINEERING_QUIZ)
     _add_questions(m3, THREAT_MODELING_QUIZ)
+    _add_questions(m4, PASSWORD_ATTACKS_QUIZ)
+    _add_questions(m5, MALWARE_QUIZ)
+    _add_questions(m6, NETWORK_WEB_QUIZ)
     db.session.commit()
 
-    modules = [m1, m2, m3]
+    modules = [m1, m2, m3, m4, m5, m6]
 
     # --- Assign all modules to all employees (UserProgress rows) ---
     for emp in employees:
@@ -475,10 +831,35 @@ def _do_seed():
                   'No prior verification through a known channel',
         difficulty='hard', is_phishing=True, created_by=trainer.id,
     )
-    db.session.add_all([c1, c2, c3, c4])
+    c5 = PhishingCampaign(
+        title='Shared Document Notification',
+        subject='A document was shared with you: "Q3 Budget (Final).xlsx"',
+        sender_name='DocuShare', sender_email='no-reply@docu-share-files.com',
+        body='<p>Hello,</p><p>A colleague shared a document with you. '
+             '<a href="http://docu-share-files.com/view?id=8842">Click here to '
+             'view it</a>. You may need to sign in with your email password to '
+             'access the file.</p><p>DocuShare</p>',
+        red_flags='Asks you to sign in with your email password on a third-party '
+                  'site (credential harvesting)\n'
+                  'Look-alike external domain (docu-share-files.com)\n'
+                  'Unexpected shared file from no specific person\n'
+                  'Link points off your corporate domain',
+        difficulty='medium', is_phishing=True, created_by=trainer.id,
+    )
+    c6 = PhishingCampaign(
+        title='IT Maintenance Window',
+        subject='Scheduled maintenance this weekend (no action needed)',
+        sender_name='IT Operations', sender_email='itops@cyberaware.local',
+        body='<p>Hi all,</p><p>We will perform routine maintenance on internal '
+             'systems this Saturday 22:00-23:00. Some services may briefly restart. '
+             'No action is required and you do not need to log in or click '
+             'anything.</p><p>&mdash; IT Operations</p>',
+        red_flags='', difficulty='easy', is_phishing=False, created_by=trainer.id,
+    )
+    db.session.add_all([c1, c2, c3, c4, c5, c6])
     db.session.commit()
 
-    campaigns = [c1, c2, c3, c4]
+    campaigns = [c1, c2, c3, c4, c5, c6]
 
     # --- Phishing assignments to all employees ---
     for emp in employees:
@@ -497,9 +878,11 @@ def _do_seed():
 
     respond(emp1, c1, 'phishing')      # correct
     respond(emp1, c3, 'legitimate')    # correct
+    respond(emp1, c5, 'phishing')      # correct
     respond(emp2, c1, 'legitimate')    # incorrect (it was phishing)
     respond(emp2, c2, 'phishing')      # correct
     respond(emp3, c3, 'phishing')      # incorrect (it was legitimate)
+    respond(emp3, c6, 'legitimate')    # correct
     db.session.commit()
 
     # --- A few activity log entries ---
@@ -513,8 +896,9 @@ def _do_seed():
     ])
     db.session.commit()
 
-    print('Seed complete: 5 users, 3 modules, %d questions, %d campaigns.'
-          % (QuizQuestion.query.count(), PhishingCampaign.query.count()))
+    print('Seed complete: 5 users, %d modules, %d questions, %d campaigns.'
+          % (TrainingModule.query.count(), QuizQuestion.query.count(),
+             PhishingCampaign.query.count()))
 
 
 if __name__ == '__main__':
