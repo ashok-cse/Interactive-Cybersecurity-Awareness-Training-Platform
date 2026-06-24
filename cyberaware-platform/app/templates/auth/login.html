@@ -1,0 +1,24 @@
+{% set public_layout = true %}
+{% extends "base.html" %}
+{% block title %}Log In — CyberAware{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h1>Log In</h1>
+  <p class="auth-sub">Welcome back to CyberAware.</p>
+  <form method="post" action="{{ url_for('auth.login') }}" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      {{ form.email.label }}
+      {{ form.email(class="form-control", autocomplete="email") }}
+      {% for error in form.email.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      {{ form.password.label }}
+      {{ form.password(class="form-control", autocomplete="current-password") }}
+      {% for error in form.password.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-primary btn-block") }}
+  </form>
+  <p class="auth-alt">No account? <a href="{{ url_for('auth.register') }}">Register here</a>.</p>
+</div>
+{% endblock %}

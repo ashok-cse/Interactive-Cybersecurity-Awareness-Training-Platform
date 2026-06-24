@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Training Modules — CyberAware{% endblock %}
+{% block content %}
+<h1>Training Modules</h1>
+
+{% if modules %}
+<div class="module-grid">
+  {% for item in modules %}
+  <div class="card module-card">
+    <h2>{{ item.module.title }}</h2>
+    {% if item.module.category %}<p class="module-category">{{ item.module.category }}</p>{% endif %}
+    <p>{{ item.module.description }}</p>
+    <p>
+      <span class="badge badge-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ') }}</span>
+    </p>
+    <div class="progress"><div class="progress-bar" style="width: {{ item.percentage }}%;"></div></div>
+    <span>{{ item.percentage }}%</span>
+    <div class="module-actions">
+      <a class="btn btn-primary" href="{{ url_for('training.module_detail', module_id=item.module.id) }}">Open Module</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><p>No training modules are available right now.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.subject }} — CyberAware{% endblock %}
+{% block content %}
+<h1>Phishing Simulation</h1>
+<p>Read the email below carefully, then classify it.</p>
+
+<div class="email-viewer card">
+  <div class="email-header">
+    <div class="email-field">
+      <span class="email-label">From:</span>
+      <span class="email-value">{{ campaign.sender_name }} &lt;{{ campaign.sender_email }}&gt;</span>
+    </div>
+    <div class="email-field">
+      <span class="email-label">Subject:</span>
+      <span class="email-value">{{ campaign.subject }}</span>
+    </div>
+  </div>
+  <div class="email-body">
+    {{ campaign.body }}
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('phishing.respond', assignment_id=assignment.id) }}" class="email-respond">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <p>How would you classify this email?</p>
+  <button type="submit" name="response" value="legitimate" class="btn btn-secondary">Legitimate</button>
+  <button type="submit" name="response" value="phishing" class="btn btn-danger">Suspicious — Phishing</button>
+</form>
+{% endblock %}

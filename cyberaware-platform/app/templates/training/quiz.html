@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Quiz: {{ module.title }} — CyberAware{% endblock %}
+{% block content %}
+<h1>Quiz: {{ module.title }}</h1>
+<p>Answer all questions and submit to see your score. Passing score is 70%.</p>
+
+<form method="post" action="{{ url_for('training.quiz', module_id=module.id) }}" class="quiz-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% for question in questions %}
+  <fieldset class="card quiz-question">
+    <legend>Question {{ loop.index }}</legend>
+    <p class="quiz-prompt">{{ question.question }}</p>
+    <div class="quiz-options">
+      <label class="quiz-option">
+        <input type="radio" name="q_{{ question.id }}" value="A" required> {{ question.option_a }}
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="q_{{ question.id }}" value="B"> {{ question.option_b }}
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="q_{{ question.id }}" value="C"> {{ question.option_c }}
+      </label>
+      <label class="quiz-option">
+        <input type="radio" name="q_{{ question.id }}" value="D"> {{ question.option_d }}
+      </label>
+    </div>
+  </fieldset>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary btn-block">Submit Quiz</button>
+</form>
+{% endblock %}

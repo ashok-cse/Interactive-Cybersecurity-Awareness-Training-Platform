@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>500 — Server Error</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="public-layout">
+    <main class="content content-centered">
+      <div class="card error-card">
+        <h1>500</h1>
+        <h2>Something Went Wrong</h2>
+        <p>An unexpected error occurred. Our team has been notified. Please try again later.</p>
+        <a class="btn btn-primary" href="{{ url_for('dashboard.index') }}">Return Home</a>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

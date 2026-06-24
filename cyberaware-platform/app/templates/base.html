@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CyberAware{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% set show_sidebar = current_user.is_authenticated and not public_layout|default(false) %}
+{% macro flash_messages() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-area">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category in ['success','danger','info'] else 'info' }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+{% endmacro %}
+
+{% if show_sidebar %}
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">CyberAware</div>
+      <nav class="sidebar-nav">
+        {% if current_user.is_admin %}
+          <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+          <a href="{{ url_for('admin.users') }}">Users</a>
+          <a href="{{ url_for('admin.assign_modules') }}">Assign Modules</a>
+          <a href="{{ url_for('admin.campaigns') }}">Campaigns</a>
+          <a href="{{ url_for('admin.analytics') }}">Analytics</a>
+          <a href="{{ url_for('admin.reports') }}">Reports</a>
+          <a href="{{ url_for('auth.profile') }}">Profile</a>
+        {% elif current_user.is_trainer %}
+          <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+          <a href="{{ url_for('training.modules') }}">Training</a>
+          <a href="{{ url_for('admin.campaigns') }}">Campaigns</a>
+          <a href="{{ url_for('admin.assign_modules') }}">Assign Modules</a>
+          <a href="{{ url_for('admin.analytics') }}">Analytics</a>
+          <a href="{{ url_for('admin.reports') }}">Reports</a>
+          <a href="{{ url_for('auth.profile') }}">Profile</a>
+        {% else %}
+          <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+          <a href="{{ url_for('training.modules') }}">Training</a>
+          <a href="{{ url_for('phishing.inbox') }}">Phishing Inbox</a>
+          <a href="{{ url_for('auth.profile') }}">Profile</a>
+        {% endif %}
+        <form action="{{ url_for('auth.logout') }}" method="post" class="sidebar-logout" data-confirm-logout>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger btn-block">Logout</button>
+        </form>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <span class="topbar-user">{{ current_user.name }}
+          <span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span>
+        </span>
+      </header>
+      {{ flash_messages() }}
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+{% else %}
+  <div class="public-layout">
+    {{ flash_messages() }}
+    <main class="content content-centered">
+      {{ self.content() }}
+    </main>
+  </div>
+{% endif %}
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

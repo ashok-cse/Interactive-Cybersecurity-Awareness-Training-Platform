@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Reports — CyberAware{% endblock %}
+{% block content %}
+<h1>Reports</h1>
+
+<div class="stat-grid">
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.total_users }}</div>
+    <div class="stat-label">Total Users</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.total_modules }}</div>
+    <div class="stat-label">Total Modules</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.total_attempts }}</div>
+    <div class="stat-label">Quiz Attempts</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.completion_rate }}%</div>
+    <div class="stat-label">Completion Rate</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.avg_score }}%</div>
+    <div class="stat-label">Average Score</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ report_summary.phishing_responses }}</div>
+    <div class="stat-label">Phishing Responses</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Download CSV Reports</h2>
+  <p>Export raw data for offline analysis.</p>
+  <div class="report-downloads">
+    <a class="btn btn-secondary" href="{{ url_for('reports.user_progress_csv') }}">User Progress CSV</a>
+    <a class="btn btn-secondary" href="{{ url_for('reports.quiz_scores_csv') }}">Quiz Scores CSV</a>
+    <a class="btn btn-secondary" href="{{ url_for('reports.phishing_csv') }}">Phishing Results CSV</a>
+  </div>
+</div>
+{% endblock %}

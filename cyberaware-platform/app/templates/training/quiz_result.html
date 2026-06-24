@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Quiz Result — CyberAware{% endblock %}
+{% block content %}
+<h1>Quiz Result: {{ module.title }}</h1>
+
+<div class="card quiz-result-summary">
+  <div class="stat-value">{{ score }}%</div>
+  {% if passed %}
+    <span class="badge badge-passed">Passed</span>
+  {% else %}
+    <span class="badge badge-failed">Failed</span>
+  {% endif %}
+  <p>Passing score is 70%.</p>
+</div>
+
+{% for r in results %}
+<div class="card quiz-result-item">
+  <p class="quiz-prompt">{{ r.question }}</p>
+  <ul class="quiz-result-answers">
+    <li>
+      Your answer:
+      <strong>{{ r.your_answer }}{% if r.options and r.your_answer in r.options %} — {{ r.options[r.your_answer] }}{% endif %}</strong>
+      {% if r.is_correct %}<span class="badge badge-passed">Correct</span>
+      {% else %}<span class="badge badge-failed">Incorrect</span>{% endif %}
+    </li>
+    {% if not r.is_correct %}
+    <li>
+      Correct answer:
+      <strong>{{ r.correct_answer }}{% if r.options and r.correct_answer in r.options %} — {{ r.options[r.correct_answer] }}{% endif %}</strong>
+    </li>
+    {% endif %}
+  </ul>
+  {% if r.explanation %}
+  <p class="quiz-explanation"><em>{{ r.explanation }}</em></p>
+  {% endif %}
+</div>
+{% endfor %}
+
+<div class="quiz-result-actions">
+  <a class="btn btn-secondary" href="{{ url_for('training.module_detail', module_id=module.id) }}">Back to Module</a>
+  {% if not passed %}
+  <a class="btn btn-primary" href="{{ url_for('training.quiz', module_id=module.id) }}">Retake Quiz</a>
+  {% endif %}
+</div>
+{% endblock %}

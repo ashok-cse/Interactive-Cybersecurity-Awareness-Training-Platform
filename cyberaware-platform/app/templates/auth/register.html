@@ -1,0 +1,39 @@
+{% set public_layout = true %}
+{% extends "base.html" %}
+{% block title %}Register — CyberAware{% endblock %}
+{% block content %}
+<div class="auth-card card">
+  <h1>Create Account</h1>
+  <p class="auth-sub">Join your organization's security awareness program.</p>
+  <form method="post" action="{{ url_for('auth.register') }}" novalidate>
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+      {{ form.name.label }}
+      {{ form.name(class="form-control", autocomplete="name") }}
+      {% for error in form.name.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      {{ form.email.label }}
+      {{ form.email(class="form-control", autocomplete="email") }}
+      {% for error in form.email.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      {{ form.department.label }}
+      {{ form.department(class="form-control", autocomplete="organization") }}
+      {% for error in form.department.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      {{ form.password.label }}
+      {{ form.password(class="form-control", autocomplete="new-password") }}
+      {% for error in form.password.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="form-group">
+      {{ form.confirm_password.label }}
+      {{ form.confirm_password(class="form-control", autocomplete="new-password") }}
+      {% for error in form.confirm_password.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-primary btn-block") }}
+  </form>
+  <p class="auth-alt">Already registered? <a href="{{ url_for('auth.login') }}">Log in</a>.</p>
+</div>
+{% endblock %}

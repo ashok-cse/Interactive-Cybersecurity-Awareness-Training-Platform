@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Profile — CyberAware{% endblock %}
+{% block content %}
+<h1>My Profile</h1>
+
+<div class="card">
+  <h2>Account Details</h2>
+  <table class="table">
+    <tbody>
+      <tr><th>Name</th><td>{{ current_user.name }}</td></tr>
+      <tr><th>Email</th><td>{{ current_user.email }}</td></tr>
+      <tr><th>Department</th><td>{{ current_user.department or '—' }}</td></tr>
+      <tr><th>Role</th><td><span class="badge badge-{{ current_user.role }}">{{ current_user.role }}</span></td></tr>
+      <tr><th>Member Since</th><td>{{ current_user.created_at.strftime('%Y-%m-%d') if current_user.created_at else '—' }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Training Progress</h2>
+  {% if progress %}
+  <table class="table">
+    <thead>
+      <tr><th>Module</th><th>Status</th><th>Completion</th></tr>
+    </thead>
+    <tbody>
+      {% for item in progress %}
+      <tr>
+        <td>{{ item.module.title }}</td>
+        <td><span class="badge badge-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ') }}</span></td>
+        <td>
+          <div class="progress"><div class="progress-bar" style="width: {{ item.percentage }}%;"></div></div>
+          <span>{{ item.percentage }}%</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No training progress recorded yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

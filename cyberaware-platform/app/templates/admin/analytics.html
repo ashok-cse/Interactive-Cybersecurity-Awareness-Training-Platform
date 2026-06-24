@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Analytics — CyberAware{% endblock %}
+{% block content %}
+<h1>Analytics</h1>
+
+<script id="chart-data" type="application/json">{{ chart_data|tojson }}</script>
+
+<div class="analytics-grid">
+  <div class="card">
+    <h2>Module Completion (%)</h2>
+    <canvas id="completionChart"></canvas>
+  </div>
+  <div class="card">
+    <h2>Average Quiz Score</h2>
+    <canvas id="avgScoreChart"></canvas>
+  </div>
+  <div class="card">
+    <h2>Quiz Pass / Fail</h2>
+    <canvas id="passFailChart"></canvas>
+  </div>
+  <div class="card">
+    <h2>Phishing Responses</h2>
+    <canvas id="phishingChart"></canvas>
+  </div>
+</div>
+{% endblock %}

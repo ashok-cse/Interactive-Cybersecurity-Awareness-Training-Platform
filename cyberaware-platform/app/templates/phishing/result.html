@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Phishing Result — CyberAware{% endblock %}
+{% block content %}
+<h1>Phishing Result</h1>
+
+<div class="card phishing-result-summary">
+  {% if is_correct %}
+    <span class="badge badge-passed">Correct</span>
+    <p>Well done — you classified this email correctly.</p>
+  {% else %}
+    <span class="badge badge-failed">Incorrect</span>
+    <p>Not quite. Review the indicators below to sharpen your instincts.</p>
+  {% endif %}
+  <p>
+    Your response:
+    {% if assignment.user_response == 'phishing' %}<span class="badge badge-suspicious">Phishing</span>
+    {% elif assignment.user_response == 'legitimate' %}<span class="badge badge-legitimate">Legitimate</span>
+    {% else %}—{% endif %}
+  </p>
+  <p>
+    Correct classification:
+    {% if correct_label == 'phishing' %}<span class="badge badge-suspicious">Phishing</span>
+    {% elif correct_label == 'legitimate' %}<span class="badge badge-legitimate">Legitimate</span>
+    {% else %}{{ correct_label }}{% endif %}
+  </p>
+</div>
+
+<div class="email-viewer card">
+  <div class="email-header">
+    <div class="email-field">
+      <span class="email-label">From:</span>
+      <span class="email-value">{{ campaign.sender_name }} &lt;{{ campaign.sender_email }}&gt;</span>
+    </div>
+    <div class="email-field">
+      <span class="email-label">Subject:</span>
+      <span class="email-value">{{ campaign.subject }}</span>
+    </div>
+  </div>
+  <div class="email-body">
+    {{ campaign.body }}
+  </div>
+</div>
+
+<div class="card">
+  <h2>Red Flags</h2>
+  {% if red_flags %}
+  <ul class="red-flags">
+    {% for flag in red_flags %}
+    <li>{{ flag }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No specific red flags were recorded for this email.</p>
+  {% endif %}
+</div>
+
+<div class="result-actions">
+  <a class="btn btn-secondary" href="{{ url_for('phishing.inbox') }}">Back to Inbox</a>
+</div>
+{% endblock %}

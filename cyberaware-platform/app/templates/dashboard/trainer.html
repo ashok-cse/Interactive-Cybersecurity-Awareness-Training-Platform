@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Trainer Dashboard — CyberAware{% endblock %}
+{% block content %}
+<h1>Trainer Dashboard</h1>
+
+<div class="stat-grid">
+  <div class="stat-card card">
+    <div class="stat-value">{{ stats.total_users }}</div>
+    <div class="stat-label">Total Users</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ stats.completion_rate }}%</div>
+    <div class="stat-label">Completion Rate</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ stats.avg_score }}%</div>
+    <div class="stat-label">Average Score</div>
+  </div>
+  <div class="stat-card card">
+    <div class="stat-value">{{ stats.total_campaigns }}</div>
+    <div class="stat-label">Phishing Campaigns</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Module Performance</h2>
+  {% if module_stats %}
+  <table class="table">
+    <thead><tr><th>Module</th><th>Completion Rate</th><th>Average Score</th></tr></thead>
+    <tbody>
+      {% for ms in module_stats %}
+      <tr>
+        <td>{{ ms.module.title }}</td>
+        <td>
+          <div class="progress"><div class="progress-bar" style="width: {{ ms.completion_rate }}%;"></div></div>
+          <span>{{ ms.completion_rate }}%</span>
+        </td>
+        <td>{{ ms.avg_score }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No module data available.</p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <h2>Users</h2>
+  {% if users %}
+  <table class="table">
+    <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Role</th></tr></thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.name }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.department or '—' }}</td>
+        <td><span class="badge badge-{{ u.role }}">{{ u.role }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No users found.</p>
+  {% endif %}
+</div>
+{% endblock %}

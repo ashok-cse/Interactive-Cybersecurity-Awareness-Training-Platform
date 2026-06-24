@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Phishing Inbox — CyberAware{% endblock %}
+{% block content %}
+<h1>Phishing Inbox</h1>
+<p>Review each message and decide whether it is legitimate or a phishing attempt.</p>
+
+<div class="card">
+  {% if assignments %}
+  <table class="table inbox-table">
+    <thead><tr><th>From</th><th>Subject</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for a in assignments %}
+      <tr>
+        <td>{{ a.campaign.sender_name }}</td>
+        <td>{{ a.campaign.subject }}</td>
+        <td>
+          {% if a.responded %}<span class="badge badge-completed">Responded</span>
+          {% else %}<span class="badge badge-in-progress">Unread</span>{% endif %}
+        </td>
+        <td>
+          {% if a.responded %}
+            <a class="btn btn-secondary" href="{{ url_for('phishing.result', assignment_id=a.id) }}">View Result</a>
+          {% else %}
+            <a class="btn btn-primary" href="{{ url_for('phishing.email_detail', assignment_id=a.id) }}">Open</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>Your phishing inbox is empty.</p>
+  {% endif %}
+</div>
+{% endblock %}

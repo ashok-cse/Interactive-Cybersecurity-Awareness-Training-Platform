@@ -1,0 +1,41 @@
+# Python artefacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Local database and instance folder (use a volume instead)
+instance/
+*.db
+*.sqlite
+
+# Secrets and local config
+.env
+
+# Tests (not needed in production image)
+tests/
+pytest.ini
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentation
+*.md
+SECURITY.md
+TEST_CASES.md
+
+# Version control
+.git/
+.gitignore
+
+# IDE / OS artefacts
+.DS_Store
+.idea/
+.vscode/
+*.swp
