@@ -1,2 +1,45 @@
 .claude/
+# Python byte-compiled / optimised / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# SQLite databases and Flask instance folder
+instance/
+*.db
+*.sqlite
+
+# Environment / secrets (NEVER commit these)
+.env
+*.env.local
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# macOS artefacts
 .DS_Store
+
+# IDE artefacts
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+gunicorn_access.log
+gunicorn_error.log
