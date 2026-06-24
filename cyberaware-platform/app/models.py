@@ -1,10 +1,9 @@
 """Database models for the CyberAware platform."""
-from datetime import datetime
-
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .extensions import db
+from .utils import utcnow
 
 
 class User(UserMixin, db.Model):
@@ -16,7 +15,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255))
     role = db.Column(db.String(20), default='employee', nullable=False)
     department = db.Column(db.String(120))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
     attempts = db.relationship(
         'QuizAttempt', backref='user', lazy=True, cascade='all, delete-orphan'
@@ -102,7 +101,7 @@ class QuizAttempt(db.Model):
     module_id = db.Column(db.Integer, db.ForeignKey('training_module.id'), nullable=False)
     score = db.Column(db.Integer)  # 0-100
     passed = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
     module = db.relationship('TrainingModule')
 
@@ -141,7 +140,7 @@ class PhishingCampaign(db.Model):
     difficulty = db.Column(db.String(20), default='easy')  # easy|medium|hard
     is_phishing = db.Column(db.Boolean, default=True)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
     assignments = db.relationship(
         'PhishingAssignment', backref='campaign', lazy=True,
@@ -186,7 +185,7 @@ class ActivityLog(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     action = db.Column(db.String(255))
     ip_address = db.Column(db.String(45))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
     user = db.relationship('User')
 

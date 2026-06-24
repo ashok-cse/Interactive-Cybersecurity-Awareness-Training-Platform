@@ -1,6 +1,4 @@
 """Training routes: modules, detail, quiz, results."""
-from datetime import datetime
-
 from flask import (
     Blueprint, render_template, redirect, url_for, flash, request, abort,
     current_app, session
@@ -10,6 +8,7 @@ from flask_login import login_required, current_user
 from ..extensions import db
 from ..models import TrainingModule, QuizQuestion, QuizAttempt, UserProgress
 from ..security import log_activity
+from ..utils import utcnow
 
 training_bp = Blueprint('training', __name__, url_prefix='/training')
 
@@ -114,7 +113,7 @@ def quiz(module_id):
             module_id=module_id,
             score=score,
             passed=passed,
-            created_at=datetime.utcnow(),
+            created_at=utcnow(),
         )
         db.session.add(attempt)
 
@@ -122,7 +121,7 @@ def quiz(module_id):
         if passed:
             progress.status = 'completed'
             progress.completion_percentage = 100
-            progress.completed_at = datetime.utcnow()
+            progress.completed_at = utcnow()
         elif progress.status == 'not_started':
             progress.status = 'in_progress'
             progress.completion_percentage = max(progress.completion_percentage, 50)

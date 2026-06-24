@@ -1,12 +1,12 @@
-version: "3.8"
-
 services:
   web:
     build: .
     # Load all environment variables from .env (copy .env.example → .env first)
     env_file: .env
     ports:
-      - "5000:5000"
+      # host:container — host port is configurable (macOS reserves 5000 for AirPlay).
+      # Override with HOST_PORT in .env if 8000 is taken. Container stays 5000.
+      - "${HOST_PORT:-8000}:5000"
     volumes:
       # Persist the SQLite database across container restarts
       - cyberaware_data:/data

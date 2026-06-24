@@ -1,6 +1,4 @@
 """Phishing simulation routes: inbox, email detail, respond, result."""
-from datetime import datetime
-
 from flask import (
     Blueprint, render_template, redirect, url_for, flash, request, abort
 )
@@ -9,6 +7,7 @@ from flask_login import login_required, current_user
 from ..extensions import db
 from ..models import PhishingAssignment, PhishingCampaign
 from ..security import log_activity
+from ..utils import utcnow
 
 phishing_bp = Blueprint('phishing', __name__, url_prefix='/phishing')
 
@@ -60,7 +59,7 @@ def respond(assignment_id):
         correct_response = campaign.correct_response
         assignment.user_response = response
         assignment.is_correct = (response == correct_response)
-        assignment.responded_at = datetime.utcnow()
+        assignment.responded_at = utcnow()
         db.session.commit()
         log_activity(
             'phishing_response: assignment=%d response=%s correct=%s'

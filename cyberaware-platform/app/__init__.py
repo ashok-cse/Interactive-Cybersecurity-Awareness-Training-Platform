@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from .config import get_config
 from .extensions import db, login_manager, csrf, limiter
+from .utils import utcnow
 
 load_dotenv()
 
@@ -43,7 +44,7 @@ def create_app(config_name=None):
     def _session_management():
         session.permanent = True
         timeout = app.config.get('SESSION_TIMEOUT_MINUTES', 30)
-        now = datetime.utcnow()
+        now = utcnow()
         last_active = session.get('last_active')
         if last_active:
             try:
