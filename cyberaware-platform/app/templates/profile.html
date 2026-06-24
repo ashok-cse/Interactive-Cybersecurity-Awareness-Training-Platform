@@ -29,7 +29,7 @@
         <td>{{ item.module.title }}</td>
         <td><span class="badge badge-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ') }}</span></td>
         <td>
-          <div class="progress"><div class="progress-bar" style="width: {{ item.percentage }}%;"></div></div>
+          <div class="progress"><div class="progress-bar" data-width="{{ item.percentage }}" style="width: {{ item.percentage }}%;"></div></div>
           <span>{{ item.percentage }}%</span>
         </td>
       </tr>

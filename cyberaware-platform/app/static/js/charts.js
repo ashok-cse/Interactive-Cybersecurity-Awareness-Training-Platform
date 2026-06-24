@@ -17,24 +17,26 @@
 (function () {
   "use strict";
 
-  /* ── Palette ─────────────────────────────────────────────── */
+  /* ── Palette (matches CSS brand gradient: violet → cyan) ──── */
   var COLORS = {
-    teal:       "rgba( 14, 165, 233, 0.80)",
-    tealBorder: "rgba( 14, 165, 233, 1.00)",
-    indigo:     "rgba( 99, 102, 241, 0.80)",
-    indigoBorder: "rgba( 99, 102, 241, 1.00)",
+    teal:       "rgba(  6, 182, 212, 0.82)",
+    tealBorder: "rgba(  6, 182, 212, 1.00)",
+    indigo:     "rgba(124,  58, 237, 0.82)",
+    indigoBorder: "rgba(124,  58, 237, 1.00)",
     success:    "rgba( 34, 197,  94, 0.85)",
     successBorder: "rgba( 34, 197,  94, 1.00)",
-    danger:     "rgba(239,  68,  68, 0.85)",
-    dangerBorder:  "rgba(239,  68,  68, 1.00)",
-    warning:    "rgba(245, 158,  11, 0.85)",
-    warningBorder: "rgba(245, 158,  11, 1.00)",
+    danger:     "rgba(244,  63,  94, 0.85)",
+    dangerBorder:  "rgba(244,  63,  94, 1.00)",
+    warning:    "rgba(217, 119,   6, 0.85)",
+    warningBorder: "rgba(217, 119,   6, 1.00)",
     muted:      "rgba(148, 163, 184, 0.70)",
     mutedBorder:   "rgba(148, 163, 184, 1.00)"
   };
 
-  /* ── Shared default options ──────────────────────────────── */
-  var defaultFontColor = "#1e293b";
+  /* ── Theme-aware text / grid colors ──────────────────────── */
+  var isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  var defaultFontColor = isDark ? "#cdc9ee" : "#1a1730";
+  var gridColor        = isDark ? "rgba(255,255,255,.08)" : "rgba(20,16,45,.07)";
 
   var barDefaults = {
     responsive: true,
@@ -52,7 +54,7 @@
       },
       y: {
         beginAtZero: true,
-        grid: { color: "rgba(0,0,0,.06)" },
+        grid: { color: gridColor },
         ticks: { color: defaultFontColor, font: { size: 11 } }
       }
     }

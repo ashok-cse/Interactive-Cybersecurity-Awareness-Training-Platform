@@ -5,14 +5,17 @@
 
 <div class="stat-grid">
   <div class="stat-card card">
+    <div class="stat-icon">✅</div>
     <div class="stat-value">{{ stats.modules_completed }}/{{ stats.modules_total }}</div>
     <div class="stat-label">Modules Completed</div>
   </div>
   <div class="stat-card card">
+    <div class="stat-icon">🧠</div>
     <div class="stat-value">{{ stats.avg_score }}%</div>
     <div class="stat-label">Average Quiz Score</div>
   </div>
   <div class="stat-card card">
+    <div class="stat-icon">🎣</div>
     <div class="stat-value">{{ stats.phishing_pending }}</div>
     <div class="stat-label">Phishing Emails Pending</div>
   </div>
@@ -29,7 +32,7 @@
         <td>{{ item.module.title }}</td>
         <td><span class="badge badge-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ') }}</span></td>
         <td>
-          <div class="progress"><div class="progress-bar" style="width: {{ item.percentage }}%;"></div></div>
+          <div class="progress"><div class="progress-bar" data-width="{{ item.percentage }}" style="width: {{ item.percentage }}%;"></div></div>
           <span>{{ item.percentage }}%</span>
         </td>
         <td><a class="btn btn-secondary" href="{{ url_for('training.module_detail', module_id=item.module.id) }}">Open</a></td>

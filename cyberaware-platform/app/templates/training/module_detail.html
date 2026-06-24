@@ -9,7 +9,7 @@
   {% if module.category %}<p class="module-category">{{ module.category }}</p>{% endif %}
   <p class="module-description">{{ module.description }}</p>
 
-  <div class="progress"><div class="progress-bar" style="width: {{ progress.percentage }}%;"></div></div>
+  <div class="progress"><div class="progress-bar" data-width="{{ progress.percentage }}" style="width: {{ progress.percentage }}%;"></div></div>
   <span>{{ progress.percentage }}% complete</span>
 
   {% if progress.status == 'not_started' %}

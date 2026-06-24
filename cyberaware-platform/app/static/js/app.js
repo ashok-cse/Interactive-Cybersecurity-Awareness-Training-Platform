@@ -85,6 +85,47 @@
     });
   }
 
+  /* ── 3b. Light / dark theme toggle ─────────────────────────── */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    try { localStorage.setItem("cyberaware-theme", theme); } catch (e) {}
+  }
+
+  function initThemeToggle() {
+    document.querySelectorAll("[data-theme-toggle]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var current = document.documentElement.getAttribute("data-theme") === "dark"
+          ? "dark" : "light";
+        applyTheme(current === "dark" ? "light" : "dark");
+      });
+    });
+  }
+
+  /* Resolve the correct answer for a button-based exercise.
+     Supports both conventions:
+       - [data-correct] on the container (e.g. "secure")
+       - [data-correct] (truthy) on the winning [data-answer] button */
+  function resolveCorrectAnswer(container, buttons) {
+    var fromContainer = (container.getAttribute("data-correct") || "").trim().toLowerCase();
+    if (fromContainer) return fromContainer;
+    var winner = null;
+    buttons.forEach(function (b) {
+      if (b.hasAttribute("data-correct")) {
+        var v = (b.getAttribute("data-correct") || "").trim().toLowerCase();
+        if (v !== "false" && v !== "0" && v !== "no") winner = b;
+      }
+    });
+    return winner ? (winner.getAttribute("data-answer") || "").trim().toLowerCase() : "";
+  }
+
+  function showFeedback(feedback, ok, text) {
+    if (!feedback) return;
+    feedback.removeAttribute("hidden");
+    feedback.classList.remove("correct", "incorrect");
+    feedback.textContent = text;
+    feedback.classList.add(ok ? "correct" : "incorrect");
+  }
+
   /* ── 4a. Code-review exercise ──────────────────────────────── */
   /**
    * Markup contract (from CONTRACT.md):
@@ -100,9 +141,9 @@
    */
   function initCodeReviewExercises() {
     document.querySelectorAll('[data-exercise="code-review"]').forEach(function (container) {
-      var correct  = (container.getAttribute("data-correct") || "").trim().toLowerCase();
       var buttons  = container.querySelectorAll("[data-answer]");
       var feedback = container.querySelector(".exercise-feedback");
+      var correct  = resolveCorrectAnswer(container, buttons);
 
       if (!buttons.length) return; // nothing to wire
 
@@ -111,17 +152,9 @@
           var answer = (btn.getAttribute("data-answer") || "").trim().toLowerCase();
           var isCorrect = (answer === correct);
 
-          // Provide feedback
-          if (feedback) {
-            feedback.classList.remove("correct", "incorrect");
-            if (isCorrect) {
-              feedback.textContent = "Correct! Good eye.";
-              feedback.classList.add("correct");
-            } else {
-              feedback.textContent = "Not quite — the correct answer is: " + correct + ".";
-              feedback.classList.add("incorrect");
-            }
-          }
+          showFeedback(feedback, isCorrect, isCorrect
+            ? "Correct! Good eye."
+            : "Not quite — the correct answer is: " + correct + ".");
 
           // Visual highlight on the clicked button
           buttons.forEach(function (b) {
@@ -151,9 +184,9 @@
    */
   function initScenarioExercises() {
     document.querySelectorAll('[data-exercise="scenario"]').forEach(function (container) {
-      var correct  = (container.getAttribute("data-correct") || "").trim().toLowerCase();
       var buttons  = container.querySelectorAll("[data-answer]");
       var feedback = container.querySelector(".exercise-feedback");
+      var correct  = resolveCorrectAnswer(container, buttons);
 
       if (!buttons.length) return;
 
@@ -162,16 +195,9 @@
           var answer    = (btn.getAttribute("data-answer") || "").trim().toLowerCase();
           var isCorrect = (answer === correct);
 
-          if (feedback) {
-            feedback.classList.remove("correct", "incorrect");
-            if (isCorrect) {
-              feedback.textContent = "Correct! You identified the scenario accurately.";
-              feedback.classList.add("correct");
-            } else {
-              feedback.textContent = "Incorrect — this scenario is actually: " + correct + ".";
-              feedback.classList.add("incorrect");
-            }
-          }
+          showFeedback(feedback, isCorrect, isCorrect
+            ? "Correct! You identified the scenario accurately."
+            : "Incorrect — this scenario is actually: " + correct + ".");
 
           buttons.forEach(function (b) {
             b.disabled = true;
@@ -217,60 +243,60 @@
         return s.trim().toLowerCase();
       }).filter(Boolean);
 
-      var checkBtn  = container.querySelector("[data-check]");
+      var checkBtn  = container.querySelector("[data-check], [data-action='check']");
       var feedback  = container.querySelector(".exercise-feedback");
-      var items     = container.querySelectorAll(".stride-item");
+      var checkboxes = container.querySelectorAll('input[type="checkbox"]');
 
-      if (!checkBtn || !items.length) return;
+      if (!checkBtn || !checkboxes.length) return;
+
+      // Resolve which boxes are correct: per-checkbox [data-correct] OR
+      // container [data-correct] comma list matched on value/data-answer.
+      function isAnswerCorrect(cb) {
+        if (cb.hasAttribute("data-correct")) {
+          var v = (cb.getAttribute("data-correct") || "").trim().toLowerCase();
+          return v !== "" && v !== "false" && v !== "0" && v !== "no";
+        }
+        var key = (cb.value || cb.getAttribute("data-answer") || "").trim().toLowerCase();
+        return correctSet.indexOf(key) !== -1;
+      }
+
+      // Total number of correct options (for the "perfect" check).
+      var totalCorrect = 0;
+      checkboxes.forEach(function (cb) { if (isAnswerCorrect(cb)) totalCorrect++; });
 
       checkBtn.addEventListener("click", function () {
-        var correct   = 0;
-        var wrong     = 0;
-        var missed    = 0;
+        var correct = 0, wrong = 0, missed = 0;
 
-        items.forEach(function (item) {
-          var checkbox = item.querySelector('input[type="checkbox"]');
-          if (!checkbox) return;
+        checkboxes.forEach(function (cb) {
+          var item = cb.closest(".stride-item") || cb.closest("label") || cb.parentElement;
+          var isCorrect = isAnswerCorrect(cb);
 
-          var value     = (checkbox.value || "").trim().toLowerCase();
-          var isChecked = checkbox.checked;
-          var isCorrect = correctSet.indexOf(value) !== -1;
+          if (item) item.classList.remove("correct-pick", "wrong-pick", "missed-pick");
 
-          // Clear previous classes
-          item.classList.remove("correct-pick", "wrong-pick", "missed-pick");
-
-          if (isChecked && isCorrect) {
-            item.classList.add("correct-pick");
+          if (cb.checked && isCorrect) {
+            if (item) item.classList.add("correct-pick");
             correct++;
-          } else if (isChecked && !isCorrect) {
-            item.classList.add("wrong-pick");
+          } else if (cb.checked && !isCorrect) {
+            if (item) item.classList.add("wrong-pick");
             wrong++;
-          } else if (!isChecked && isCorrect) {
-            item.classList.add("missed-pick");
+          } else if (!cb.checked && isCorrect) {
+            if (item) item.classList.add("missed-pick");
             missed++;
           }
         });
 
-        // Show summary feedback
-        if (feedback) {
-          feedback.classList.remove("correct", "incorrect");
-          var allRight = (correct === correctSet.length && wrong === 0 && missed === 0);
-
-          if (allRight) {
-            feedback.textContent = "Perfect! You identified all threats correctly.";
-            feedback.classList.add("correct");
-          } else {
-            var parts = [];
-            if (correct > 0) parts.push(correct + " correct");
-            if (wrong   > 0) parts.push(wrong   + " wrong");
-            if (missed  > 0) parts.push(missed  + " missed");
-            feedback.textContent = "Results: " + parts.join(", ") + ". "
-              + (missed > 0 ? "Highlighted items show what you missed." : "");
-            feedback.classList.add("incorrect");
-          }
+        var allRight = (correct === totalCorrect && wrong === 0 && missed === 0);
+        if (allRight) {
+          showFeedback(feedback, true, "Perfect! You identified all threats correctly.");
+        } else {
+          var parts = [];
+          if (correct > 0) parts.push(correct + " correct");
+          if (wrong   > 0) parts.push(wrong   + " wrong");
+          if (missed  > 0) parts.push(missed  + " missed");
+          showFeedback(feedback, false, "Results: " + parts.join(", ") + ". "
+            + (missed > 0 ? "Highlighted items show what you missed." : ""));
         }
 
-        // Disable check button after first submission
         checkBtn.disabled  = true;
         checkBtn.textContent = "Checked";
       });
@@ -303,6 +329,7 @@
     initAlerts();
     initLogoutConfirm();
     initSidebarToggle();
+    initThemeToggle();
     initCodeReviewExercises();
     initScenarioExercises();
     initThreatExercises();

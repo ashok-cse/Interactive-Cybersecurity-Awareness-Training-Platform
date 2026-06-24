@@ -5,18 +5,22 @@
 
 <div class="stat-grid">
   <div class="stat-card card">
+    <div class="stat-icon">👥</div>
     <div class="stat-value">{{ stats.total_users }}</div>
     <div class="stat-label">Total Users</div>
   </div>
   <div class="stat-card card">
+    <div class="stat-icon">📚</div>
     <div class="stat-value">{{ stats.total_modules }}</div>
     <div class="stat-label">Training Modules</div>
   </div>
   <div class="stat-card card">
+    <div class="stat-icon">🎣</div>
     <div class="stat-value">{{ stats.total_campaigns }}</div>
     <div class="stat-label">Phishing Campaigns</div>
   </div>
   <div class="stat-card card">
+    <div class="stat-icon">✅</div>
     <div class="stat-value">{{ stats.completion_rate }}%</div>
     <div class="stat-label">Completion Rate</div>
   </div>
@@ -32,7 +36,7 @@
       <tr>
         <td>{{ ms.module.title }}</td>
         <td>
-          <div class="progress"><div class="progress-bar" style="width: {{ ms.completion_rate }}%;"></div></div>
+          <div class="progress"><div class="progress-bar" data-width="{{ ms.completion_rate }}" style="width: {{ ms.completion_rate }}%;"></div></div>
           <span>{{ ms.completion_rate }}%</span>
         </td>
         <td>{{ ms.avg_score }}%</td>

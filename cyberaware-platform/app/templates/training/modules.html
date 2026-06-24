@@ -13,7 +13,7 @@
     <p>
       <span class="badge badge-{{ item.status|replace('_','-') }}">{{ item.status|replace('_',' ') }}</span>
     </p>
-    <div class="progress"><div class="progress-bar" style="width: {{ item.percentage }}%;"></div></div>
+    <div class="progress"><div class="progress-bar" data-width="{{ item.percentage }}" style="width: {{ item.percentage }}%;"></div></div>
     <span>{{ item.percentage }}%</span>
     <div class="module-actions">
       <a class="btn btn-primary" href="{{ url_for('training.module_detail', module_id=item.module.id) }}">Open Module</a>
