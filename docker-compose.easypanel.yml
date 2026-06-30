@@ -1,0 +1,38 @@
+# CyberAware Training Platform — Easypanel deployment
+# ----------------------------------------------------
+# Deploy target: Easypanel "Compose" service (builds the Dockerfile in this repo).
+# For LOCAL development use docker-compose.yml instead.
+#
+# In Easypanel:
+#   1. Project → + Service → Compose → source = this GitHub repo, branch main.
+#   2. Compose file path:  docker-compose.easypanel.yml
+#   3. Environment tab: set SECRET_KEY (required) — generate with:
+#         python -c "import secrets; print(secrets.token_hex(32))"
+#      Optionally set SEED_ON_START=true for the first deploy, then false.
+#   4. Domains: add a domain → service "web", port 5000, enable HTTPS.
+#   5. Deploy. The named volume below persists the SQLite DB across redeploys.
+
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      FLASK_ENV: production
+      # Fails the deploy loudly if you forget to set a strong secret in Easypanel.
+      SECRET_KEY: ${SECRET_KEY:?set a strong SECRET_KEY in the Easypanel Environment tab}
+      DATABASE_URL: sqlite:////data/cyberaware.db
+      # Cookies are HTTPS-only; Easypanel terminates TLS at its proxy.
+      SESSION_COOKIE_SECURE: "true"
+      SESSION_TIMEOUT_MINUTES: "30"
+      # Seeds demo accounts on first boot (idempotent). Set false after first deploy.
+      SEED_ON_START: ${SEED_ON_START:-true}
+      PORT: "5000"
+      GUNICORN_WORKERS: "2"
+    volumes:
+      # Persistent SQLite storage — keep a single replica (SQLite is not multi-writer).
+      - cyberaware_data:/data
+    expose:
+      - "5000"
+
+volumes:
+  cyberaware_data:
