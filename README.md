@@ -342,5 +342,5 @@ Please do not commit `.env` or any file containing secrets.
 
 ## Acknowledgments
 
-The content management module was added following our professor's suggestion.
-Thank you for the guidance. 🙏
+Hi Professor, we added this content management module based on your suggestion.
+Thank you for the guidance! 🙏
