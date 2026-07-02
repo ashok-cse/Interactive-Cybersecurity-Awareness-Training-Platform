@@ -4,6 +4,7 @@ from datetime import timedelta
 
 
 def _env_bool(name, default=False):
+    """Read an environment variable as a boolean (accepts 1/true/yes/on)."""
     val = os.environ.get(name)
     if val is None:
         return default

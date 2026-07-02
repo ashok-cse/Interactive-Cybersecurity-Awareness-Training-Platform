@@ -14,6 +14,7 @@ training_bp = Blueprint('training', __name__, url_prefix='/training')
 
 
 def _get_or_create_progress(user_id, module_id):
+    """Fetch the user's progress row for a module, creating a blank one if absent."""
     progress = UserProgress.query.filter_by(
         user_id=user_id, module_id=module_id
     ).first()
@@ -30,6 +31,7 @@ def _get_or_create_progress(user_id, module_id):
 @training_bp.route('/')
 @login_required
 def modules():
+    """List all active training modules with the current user's progress on each."""
     mods = (
         TrainingModule.query.filter_by(is_active=True)
         .order_by(TrainingModule.order, TrainingModule.id)
@@ -53,6 +55,7 @@ def modules():
 @training_bp.route('/module/<int:module_id>')
 @login_required
 def module_detail(module_id):
+    """Show a single module's content plus whether it has a quiz attached."""
     module = TrainingModule.query.get_or_404(module_id)
     progress = _get_or_create_progress(current_user.id, module_id)
     has_quiz = QuizQuestion.query.filter_by(module_id=module_id).count() > 0
@@ -71,6 +74,7 @@ def module_detail(module_id):
 @training_bp.route('/module/<int:module_id>/start', methods=['POST'])
 @login_required
 def start_module(module_id):
+    """Mark a module as in-progress (50%) when the user begins it."""
     TrainingModule.query.get_or_404(module_id)
     progress = _get_or_create_progress(current_user.id, module_id)
     if progress.status == 'not_started':
@@ -85,6 +89,8 @@ def start_module(module_id):
 @training_bp.route('/module/<int:module_id>/quiz', methods=['GET', 'POST'])
 @login_required
 def quiz(module_id):
+    """Render the module quiz (GET) or grade a submission, record the attempt,
+    update progress, and redirect to the result page (POST)."""
     module = TrainingModule.query.get_or_404(module_id)
     questions = (
         QuizQuestion.query.filter_by(module_id=module_id)
@@ -142,6 +148,7 @@ def quiz(module_id):
 @training_bp.route('/quiz/result/<int:attempt_id>')
 @login_required
 def quiz_result(attempt_id):
+    """Show a graded attempt with per-question feedback (owner or staff only)."""
     attempt = QuizAttempt.query.get_or_404(attempt_id)
     if attempt.user_id != current_user.id and not (
         current_user.is_admin or current_user.is_trainer

@@ -34,6 +34,8 @@ def _module_progress_list(user):
 
 
 def _employee_dashboard():
+    """Render the employee dashboard: module progress, recent quiz attempts,
+    average score, and pending phishing assignments."""
     user = current_user
     module_rows = _module_progress_list(user)
     modules_total = len(module_rows)
@@ -93,6 +95,7 @@ def _module_stats():
 
 
 def _user_progress_summaries():
+    """Per-employee summary of modules completed, completion rate, and avg score."""
     users = User.query.filter_by(role='employee').order_by(User.name).all()
     modules_total = TrainingModule.query.filter_by(is_active=True).count()
     summaries = []
@@ -114,6 +117,7 @@ def _user_progress_summaries():
 
 
 def _overall_completion_rate():
+    """Percentage of all (employee x active-module) pairs that are completed."""
     total_users = User.query.filter_by(role='employee').count()
     modules_total = TrainingModule.query.filter_by(is_active=True).count()
     denom = total_users * modules_total
@@ -124,6 +128,7 @@ def _overall_completion_rate():
 
 
 def _trainer_dashboard():
+    """Render the trainer dashboard: org-wide stats plus per-user and per-module rollups."""
     total_users = User.query.filter_by(role='employee').count()
     attempts = QuizAttempt.query.all()
     avg_score = round(sum(a.score for a in attempts) / len(attempts)) if attempts else 0
@@ -142,6 +147,7 @@ def _trainer_dashboard():
 
 
 def _admin_dashboard():
+    """Render the admin dashboard: totals, recent activity log, and module stats."""
     stats = {
         'total_users': User.query.count(),
         'total_modules': TrainingModule.query.count(),
@@ -163,12 +169,14 @@ def _admin_dashboard():
 
 @dashboard_bp.route('/')
 def index():
+    """Public landing page."""
     return render_template('index.html')
 
 
 @dashboard_bp.route('/dashboard')
 @login_required
 def home():
+    """Dispatch to the admin, trainer, or employee dashboard by role."""
     if current_user.is_admin:
         return _admin_dashboard()
     if current_user.is_trainer:

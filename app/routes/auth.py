@@ -14,6 +14,7 @@ auth_bp = Blueprint('auth', __name__)
 
 
 def _is_safe_url(target):
+    """Guard against open-redirects: only allow same-host http(s) targets."""
     if not target:
         return False
     ref = urlparse(request.host_url)
@@ -23,6 +24,7 @@ def _is_safe_url(target):
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """Create a new employee account from the registration form."""
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.home'))
     form = RegistrationForm()
@@ -49,6 +51,7 @@ def register():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit('5 per minute', methods=['POST'])
 def login():
+    """Authenticate credentials, start a session, and redirect (rate-limited)."""
     if current_user.is_authenticated:
         return redirect(url_for('dashboard.home'))
     form = LoginForm()
@@ -72,6 +75,7 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
+    """End the current user's session."""
     log_activity('logout')
     logout_user()
     flash('You have been logged out.', 'info')
@@ -81,6 +85,7 @@ def logout():
 @auth_bp.route('/profile')
 @login_required
 def profile():
+    """Show the current user's training progress and quiz-attempt history."""
     progress_records = UserProgress.query.filter_by(user_id=current_user.id).all()
     modules_total = TrainingModule.query.filter_by(is_active=True).count()
     completed = sum(1 for p in progress_records if p.status == 'completed')

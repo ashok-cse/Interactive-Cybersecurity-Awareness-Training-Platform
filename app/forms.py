@@ -2,9 +2,11 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, TextAreaField, SelectField,
-    BooleanField, SubmitField
+    BooleanField, IntegerField, SubmitField
 )
-from wtforms.validators import DataRequired, Length, EqualTo, Optional, Regexp
+from wtforms.validators import (
+    DataRequired, Length, EqualTo, Optional, Regexp, NumberRange
+)
 
 
 # WTForms' Email validator delegates to the `email_validator` package, which
@@ -49,3 +51,36 @@ class CampaignForm(FlaskForm):
     )
     is_phishing = BooleanField('This is a phishing email')
     submit = SubmitField('Create Campaign')
+
+
+class ModuleForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired(), Length(max=200)])
+    description = TextAreaField('Description', validators=[Optional()])
+    category = StringField('Category', validators=[Optional(), Length(max=100)])
+    content = TextAreaField(
+        'Content (HTML)',
+        validators=[DataRequired()],
+        description='Authored HTML. Scripts and unsafe tags are stripped on save.',
+    )
+    order = IntegerField(
+        'Display Order',
+        validators=[Optional(), NumberRange(min=0)],
+        default=0,
+    )
+    is_active = BooleanField('Active', default=True)
+    submit = SubmitField('Save Module')
+
+
+class QuestionForm(FlaskForm):
+    question = TextAreaField('Question', validators=[DataRequired()])
+    option_a = StringField('Option A', validators=[DataRequired(), Length(max=500)])
+    option_b = StringField('Option B', validators=[DataRequired(), Length(max=500)])
+    option_c = StringField('Option C', validators=[DataRequired(), Length(max=500)])
+    option_d = StringField('Option D', validators=[DataRequired(), Length(max=500)])
+    correct_answer = SelectField(
+        'Correct Answer',
+        choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')],
+        validators=[DataRequired()],
+    )
+    explanation = TextAreaField('Explanation', validators=[Optional()])
+    submit = SubmitField('Save Question')
