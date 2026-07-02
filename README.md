@@ -337,3 +337,10 @@ listed above.
 3. Open a pull request against `main`.
 
 Please do not commit `.env` or any file containing secrets.
+
+---
+
+## Acknowledgments
+
+The content management module was added following our professor's suggestion.
+Thank you for the guidance. 🙏
