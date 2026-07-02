@@ -15,6 +15,7 @@ reports_bp = Blueprint('reports', __name__, url_prefix='/reports')
 
 
 def _csv_response(filename, header, rows):
+    """Build a downloadable CSV HTTP response from a header and iterable of rows."""
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(header)
@@ -33,6 +34,7 @@ def _csv_response(filename, header, rows):
 @login_required
 @staff_required
 def user_progress_csv():
+    """Export every user's per-module training progress as CSV (staff only)."""
     header = [
         'User ID', 'Name', 'Email', 'Department', 'Role',
         'Module', 'Status', 'Completion %', 'Completed At',
@@ -59,6 +61,7 @@ def user_progress_csv():
 @login_required
 @staff_required
 def quiz_scores_csv():
+    """Export all quiz attempts (user, module, score, pass/fail) as CSV (staff only)."""
     header = ['Attempt ID', 'User', 'Email', 'Module', 'Score', 'Passed', 'Date']
     rows = []
     attempts = (
@@ -83,6 +86,7 @@ def quiz_scores_csv():
 @login_required
 @staff_required
 def phishing_csv():
+    """Export all phishing-campaign assignments and responses as CSV (staff only)."""
     header = [
         'Assignment ID', 'User', 'Email', 'Campaign', 'Is Phishing',
         'User Response', 'Correct', 'Responded At',

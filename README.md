@@ -17,6 +17,9 @@ campaigns, and analytics.
 - **Auto-graded Quizzes** – 30 questions per module (630 total); score =
   round(correct/total × 100); pass threshold 70 %, with retakes.
 - **Simulated Phishing Inbox** – employees identify phishing vs. legitimate emails.
+- **Content Management** – admins and trainers create, edit, and delete training
+  modules and quiz questions from the UI; authored HTML is sanitized with `bleach`
+  on save (scripts and unsafe markup stripped).
 - **Role-based Dashboards** – tailored views for Employee, Trainer, and Admin.
 - **Analytics** – completion rates, average scores, pass/fail charts (Chart.js).
 - **CSV Reports** – downloadable user-progress, quiz-scores, and phishing reports.
@@ -34,6 +37,7 @@ campaigns, and analytics.
 | Auth         | Flask-Login                                  |
 | Forms / CSRF | Flask-WTF + WTForms                          |
 | Rate limiting| Flask-Limiter                                |
+| HTML sanitizing | bleach (module content allowlist)         |
 | Passwords    | Werkzeug `generate_password_hash` (pbkdf2:sha256) |
 | Charts       | Chart.js (CDN)                               |
 | WSGI server  | Gunicorn (production / Docker)               |
@@ -52,7 +56,7 @@ Interactive-Cybersecurity-Awareness-Training-Platform/
 │   ├── models.py            # SQLAlchemy models
 │   ├── forms.py             # WTForms form classes
 │   ├── security.py          # roles_required, admin_required, staff_required, log_activity
-│   ├── utils.py             # shared helpers (naive-UTC utcnow)
+│   ├── utils.py             # shared helpers (naive-UTC utcnow, sanitize_html)
 │   ├── routes/
 │   │   ├── auth.py          # Blueprint 'auth'      – /register /login /logout /profile
 │   │   ├── dashboard.py     # Blueprint 'dashboard' – / /dashboard
@@ -182,6 +186,41 @@ Seeded by `seed.py` (or `SEED_ON_START=true`):
 | Employee | employee@cyberaware.local     | Employee@12345  |
 | Employee | employee2@cyberaware.local    | Employee@12345  |
 | Employee | employee3@cyberaware.local    | Employee@12345  |
+
+---
+
+## Managing Training Content
+
+Admins and trainers can author modules and quizzes directly in the UI (no seed
+editing required). Seed data (`seed.py` / `seed_data/`) is just the initial
+catalogue — everything below is fully editable at runtime.
+
+### Add or edit a module
+
+1. Log in as an **Admin** or **Trainer** and open **Modules** (admin) /
+   **Manage Modules** (trainer) in the sidebar → `/admin/modules`.
+2. Click **+ New Module**, then fill in:
+   - **Title**, **Description**, **Category**
+   - **Content (HTML)** – authored HTML for the module body. Scripts and unsafe
+     tags/attributes are stripped by `bleach` on save (see `sanitize_html` in
+     `app/utils.py`); safe formatting (headings, lists, code blocks, tables) is kept.
+   - **Display Order** – lower numbers appear first in the training list.
+   - **Active** – untick to hide the module from employees.
+3. Save. Active modules immediately appear in the training list and become
+   assignable via **Assign Modules**. Editing re-sanitizes the content; deleting a
+   module cascades to its quiz questions and user progress.
+
+### Add or edit quiz questions
+
+1. On any module row in `/admin/modules`, click **Questions**.
+2. Click **+ New Question** and provide the question text, four options (A–D),
+   the **correct answer** letter, and an optional **explanation** shown on the
+   result page.
+3. Save. New questions flow straight into the module's auto-graded quiz
+   (score = round(correct/total × 100), pass threshold 70 %).
+
+All create/edit/delete actions are recorded in the activity log with the acting
+user and IP.
 
 ---
 

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Questions — {{ module.title }}{% endblock %}
+{% block content %}
+<h1>Quiz Questions</h1>
+<p><a href="{{ url_for('admin.modules') }}">&larr; Back to modules</a> &nbsp;|&nbsp; Module: <strong>{{ module.title }}</strong></p>
+
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>{{ questions|length }} Question(s)</h2>
+    <a href="{{ url_for('admin.question_new', module_id=module.id) }}" class="btn btn-primary">+ New Question</a>
+  </div>
+  {% if questions %}
+  <table class="table">
+    <thead>
+      <tr><th>#</th><th>Question</th><th>Correct</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for q in questions %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ q.question }}</td>
+        <td><span class="badge badge-legitimate">{{ q.correct_answer }}</span></td>
+        <td>
+          <a href="{{ url_for('admin.question_edit', question_id=q.id) }}" class="btn btn-sm">Edit</a>
+          <form method="post" action="{{ url_for('admin.question_delete', question_id=q.id) }}"
+                style="display:inline" onsubmit="return confirm('Delete this question?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No questions yet. Add the first one.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -55,6 +55,7 @@
         {% if current_user.is_admin %}
           <a href="{{ url_for('dashboard.home') }}"><span class="nav-ico">📊</span> Dashboard</a>
           <a href="{{ url_for('admin.users') }}"><span class="nav-ico">👥</span> Users</a>
+          <a href="{{ url_for('admin.modules') }}"><span class="nav-ico">📚</span> Modules</a>
           <a href="{{ url_for('admin.assign_modules') }}"><span class="nav-ico">🎯</span> Assign Modules</a>
           <a href="{{ url_for('admin.campaigns') }}"><span class="nav-ico">🎣</span> Campaigns</a>
           <a href="{{ url_for('admin.analytics') }}"><span class="nav-ico">📈</span> Analytics</a>
@@ -63,6 +64,7 @@
         {% elif current_user.is_trainer %}
           <a href="{{ url_for('dashboard.home') }}"><span class="nav-ico">📊</span> Dashboard</a>
           <a href="{{ url_for('training.modules') }}"><span class="nav-ico">📚</span> Training</a>
+          <a href="{{ url_for('admin.modules') }}"><span class="nav-ico">✏️</span> Manage Modules</a>
           <a href="{{ url_for('admin.campaigns') }}"><span class="nav-ico">🎣</span> Campaigns</a>
           <a href="{{ url_for('admin.assign_modules') }}"><span class="nav-ico">🎯</span> Assign Modules</a>
           <a href="{{ url_for('admin.analytics') }}"><span class="nav-ico">📈</span> Analytics</a>

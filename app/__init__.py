@@ -13,6 +13,8 @@ load_dotenv()
 
 
 def create_app(config_name=None):
+    """Build and configure the Flask app: load config, init extensions,
+    register blueprints/error handlers, and create tables. Returns the app."""
     app = Flask(__name__)
     config_class = get_config(config_name)
     app.config.from_object(config_class)

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Manage Modules — CyberAware{% endblock %}
+{% block content %}
+<h1>Training Modules</h1>
+
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2>All Modules</h2>
+    <a href="{{ url_for('admin.module_new') }}" class="btn btn-primary">+ New Module</a>
+  </div>
+  {% if modules %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Order</th><th>Title</th><th>Category</th>
+        <th>Active</th><th>Questions</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in modules %}
+      <tr>
+        <td>{{ m.order }}</td>
+        <td>{{ m.title }}</td>
+        <td>{{ m.category or '—' }}</td>
+        <td>
+          {% if m.is_active %}<span class="badge badge-legitimate">Active</span>
+          {% else %}<span class="badge badge-suspicious">Hidden</span>{% endif %}
+        </td>
+        <td>{{ counts[m.id] }}</td>
+        <td>
+          <a href="{{ url_for('admin.module_edit', module_id=m.id) }}" class="btn btn-sm">Edit</a>
+          <a href="{{ url_for('admin.module_questions', module_id=m.id) }}" class="btn btn-sm">Questions</a>
+          <form method="post" action="{{ url_for('admin.module_delete', module_id=m.id) }}"
+                style="display:inline" onsubmit="return confirm('Delete this module and all its questions?');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No modules yet. Create your first one.</p>
+  {% endif %}
+</div>
+{% endblock %}

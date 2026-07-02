@@ -29,23 +29,28 @@ class User(UserMixin, db.Model):
     )
 
     def set_password(self, password):
+        """Hash the given plaintext password and store it on the user."""
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
+        """Return True if the plaintext password matches the stored hash."""
         if not self.password_hash:
             return False
         return check_password_hash(self.password_hash, password)
 
     @property
     def is_admin(self):
+        """True when this user has the admin role."""
         return self.role == 'admin'
 
     @property
     def is_trainer(self):
+        """True when this user has the trainer role."""
         return self.role == 'trainer'
 
     @property
     def is_employee(self):
+        """True when this user has the employee role."""
         return self.role == 'employee'
 
     def __repr__(self):
@@ -149,9 +154,11 @@ class PhishingCampaign(db.Model):
 
     @property
     def correct_response(self):
+        """The expected user verdict for this email ('phishing' or 'legitimate')."""
         return 'phishing' if self.is_phishing else 'legitimate'
 
     def red_flags_list(self):
+        """Split the newline-separated red_flags text into a clean list of strings."""
         if not self.red_flags:
             return []
         return [line.strip() for line in self.red_flags.splitlines() if line.strip()]
@@ -172,6 +179,7 @@ class PhishingAssignment(db.Model):
 
     @property
     def responded(self):
+        """True once the user has submitted a response to this assignment."""
         return self.responded_at is not None
 
     def __repr__(self):
